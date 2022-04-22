@@ -4,6 +4,7 @@ import com.sofka.arqHexagonalBiblioteca.application.service.BibliotecaService;
 import com.sofka.arqHexagonalBiblioteca.domain.Biblioteca;
 import com.sofka.arqHexagonalBiblioteca.infraestructure.rest.spring.controller.BibliotecaController;
 import com.sofka.arqHexagonalBiblioteca.infraestructure.rest.spring.dto.BibliotecaDTO;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +18,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebFluxTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {BibliotecaService.class, Biblioteca.class, BibliotecaController.class, BibliotecaDTO.class})
+@ContextConfiguration(classes = {Biblioteca.class, BibliotecaDTO.class, BibliotecaController.class})
 public class BibliotecaTest {
 
     @MockBean
@@ -52,11 +50,11 @@ public class BibliotecaTest {
                 .uri("/bibliotecaReactiva")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$",hasSize(1))
-                .value(response->{
-                    jsonPath("$[0].id", is("tytyty"));
-                    jsonPath("$[0].name", is("Libro"));
-                    jsonPath("$[0].estado", is("No prestado"));
+                .expectBodyList(Biblioteca.class)
+                .value(response ->{
+                    Assertions.assertEquals("tytyty5", response.get(0).getId());
+                    Assertions.assertEquals("Libro", response.get(0).getName());
+                    Assertions.assertEquals("No prestado", response.get(0).getEstado());
                 });
     }
 
@@ -75,7 +73,10 @@ public class BibliotecaTest {
                 .uri("/bibliotecaReactiva/{Id}/disponibilidad","tytyty5")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().equals("Hay disponibles 2 libros de Libro");
+                .expectBody(String.class)
+                .value(response->{
+                    Assertions.assertEquals("Hay disponibles 2 libros de Libro", response.toString());
+                });
     }
 
     @Test
@@ -93,7 +94,10 @@ public class BibliotecaTest {
                 .uri("/bibliotecaReactiva/{Id}/prestar","tytyty5")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().equals("Se presta el libro Soledad. Quedan: 1");
+                .expectBody(String.class)
+                .value(response->{
+                    Assertions.assertEquals("Se presta el libro Soledad. Quedan: 1", response.toString());
+                });
 
     }
 
@@ -119,14 +123,14 @@ public class BibliotecaTest {
                 .uri("/bibliotecaReactiva/{categoria}/recomendar","Novela")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$",hasSize(2))
+                .expectBodyList(Biblioteca.class)
                 .value(response->{
-                    jsonPath("$[0].id", is("tytyty5"));
-                    jsonPath("$[0].name", is("Cien años de soledad"));
-                    jsonPath("$[0].estado", is("No prestado"));
-                    jsonPath("$[1].id", is("tyug34"));
-                    jsonPath("$[1].name", is("El otoño del patriarca"));
-                    jsonPath("$[1].estado", is("Prestado"));
+                    Assertions.assertEquals("tytyty5",response.get(0).getId());
+                    Assertions.assertEquals("Cien años de soledad",response.get(0).getName());
+                    Assertions.assertEquals("No prestado",response.get(0).getEstado());
+                    Assertions.assertEquals("tyug34",response.get(1).getId());
+                    Assertions.assertEquals("El otoño del patriarca",response.get(1).getName());
+                    Assertions.assertEquals("Prestado",response.get(1).getEstado());
                 });
     }
 
@@ -144,7 +148,10 @@ public class BibliotecaTest {
                 .uri("/bibliotecaReactiva/{Id}/devolver","tytyty5")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().equals("Se devolvio el libro Soledad");
+                .expectBody(String.class)
+                .value(response->{
+                    Assertions.assertEquals("Se devolvio el libro Soledad", response.toString());
+                });
     }
 
 }
