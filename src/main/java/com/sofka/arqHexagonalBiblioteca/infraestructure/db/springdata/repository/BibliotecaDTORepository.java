@@ -6,10 +6,14 @@ import com.sofka.arqHexagonalBiblioteca.infraestructure.db.springdata.dto.Biblio
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Configuration
+@EnableReactiveMongoRepositories(basePackages = "com.sofka.arqHexagonalBiblioteca.infraestructure.db.springdata.repository")
 @RequiredArgsConstructor
 @Service
 public class BibliotecaDTORepository implements BibliotecaRepository {

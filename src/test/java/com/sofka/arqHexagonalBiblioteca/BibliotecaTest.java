@@ -55,6 +55,7 @@ public class BibliotecaTest {
                     Assertions.assertEquals("tytyty5", response.get(0).getId());
                     Assertions.assertEquals("Libro", response.get(0).getName());
                     Assertions.assertEquals("No prestado", response.get(0).getEstado());
+                    Assertions.assertEquals(null, response.get(0).getFechaPrestamo());
                 });
     }
 
